@@ -1,5 +1,6 @@
 package com.sooba.popularmovies.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -8,9 +9,16 @@ import android.provider.BaseColumns;
  */
 public class MovieContract {
 
+    public static final String CONTENT_AUTHORITY = "com.sooba.popularmovies";
+
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
+
+    public static final String PATH_MOVIE = "movie";
+
     public static final String MOVIE_SQL_CREATE_TABLE =
             "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
                     MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    MovieEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL, " +
                     MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, "+
                     MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT, " +
                     MovieEntry.COLUMN_ORIGINAL_LANGUAGE + " TEXT, "+
@@ -28,6 +36,7 @@ public class MovieContract {
     public static class MovieEntry implements BaseColumns {
         public static final String TABLE_NAME = "movie";
 
+        public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_POSTER_PATH = "poster_path";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_RELEASE_DATE = "release_date";

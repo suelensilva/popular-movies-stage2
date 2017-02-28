@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.DataBindingUtil;
 import android.media.Image;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -69,11 +70,15 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Adds the current movie to the list of favorite movies, persisting
+     * it in database
+     *
+     * @param view the view that the user clicked to trigger this action
+     */
     public void handleFavoriteMovie (View view) {
-        MovieDbHelper movieDbHelper = new MovieDbHelper(this);
-        SQLiteDatabase db = movieDbHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues();
+        values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, mMovie.getId());
         values.put(MovieContract.MovieEntry.COLUMN_TITLE, mMovie.getTitle());
         values.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, mMovie.getOriginalTitle());
         values.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, mMovie.getOriginalLanguage());
@@ -83,8 +88,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         values.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, mMovie.getVoteAverage());
         values.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
 
-        db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
+        Uri.Builder uriBuilder = MovieContract.BASE_CONTENT_URI.buildUpon();
+        Uri uri = uriBuilder.appendPath(MovieContract.PATH_MOVIE).build();
 
+        getContentResolver().insert(uri, values);
     }
 
     class FetchVideosTask extends AsyncTask<String, Void, Void> {

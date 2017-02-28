@@ -19,6 +19,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".MovieDetailActivity"></activity>
+        <provider
+            android:authorities="com.sooba.popularmovies"
+            android:name="com.sooba.popularmovies.data.MovieProvider" />
     </application>
 
 </manifest>
