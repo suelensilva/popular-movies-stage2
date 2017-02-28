@@ -68,6 +68,24 @@ public class NetworkUtils {
         return url;
     }
 
+    public static URL buildVideoUrl(String movieId, String apiKey){
+        if(TextUtils.isEmpty(movieId))
+            return null;
+
+        Uri.Builder builder = Uri.parse(MOVIES_URL).buildUpon();
+        builder.appendPath(movieId).appendPath("videos").appendQueryParameter(API_KEY_QUERY, apiKey);
+        Uri uri = builder.build();
+
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error while building the URL query");
+        }
+
+        return url;
+    }
+
     /**
      * This method returns the entire result from the HTTP response.
      *

@@ -13,6 +13,7 @@ import com.sooba.popularmovies.utilities.Constants;
 import com.sooba.popularmovies.utilities.Utils;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ import java.util.List;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolder> {
 
     Context mContext;
-    List<Movie> movies;
+    List<Movie> movies = new ArrayList<>();
 
     /* Listener received from activity that will handle the click events */
     final private ListItemClickListener mOnClickListener;
@@ -59,7 +60,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     }
 
     public void setData(List<Movie> movies) {
-        this.movies = movies;
+        this.movies.clear();
+
+        if(movies != null) {
+            this.movies.addAll(movies);
+        }
     }
 
     @Override

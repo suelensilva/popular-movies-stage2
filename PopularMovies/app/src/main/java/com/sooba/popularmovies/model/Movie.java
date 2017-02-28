@@ -1,16 +1,18 @@
 package com.sooba.popularmovies.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.Serializable;
 
 /**
  * Class that represents a movie and all values related to it
  */
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
 
     /* json keys for movies attributes */
+    private static final String ID_KEY = "id";
     private static final String POSTER_PATH_KEY = "poster_path";
     private static final String OVERVIEW_KEY = "overview";
     private static final String RELEASE_DATE_KEY = "release_date";
@@ -19,6 +21,7 @@ public class Movie implements Serializable {
     private static final String TITLE_KEY = "title";
     private static final String VOTE_AVERAGE = "vote_average";
 
+    private String id;
     private String posterPath;
     private String overview;
     private String releaseDate;
@@ -30,6 +33,11 @@ public class Movie implements Serializable {
     // Construction that uses a json string representing a movie to initialize
     // a new movie instance
     public Movie(JSONObject jsonMovie) throws JSONException {
+
+        if(jsonMovie.has(ID_KEY)) {
+            id = jsonMovie.getString(ID_KEY);
+        }
+
         if(jsonMovie.has(POSTER_PATH_KEY)) {
             posterPath = jsonMovie.getString(POSTER_PATH_KEY);
         }
@@ -53,6 +61,29 @@ public class Movie implements Serializable {
             voteAverage = jsonMovie.getDouble(VOTE_AVERAGE);
         }
     }
+
+    protected Movie(Parcel in) {
+        id = in.readString();
+        posterPath = in.readString();
+        overview = in.readString();
+        releaseDate = in.readString();
+        originalTitle = in.readString();
+        originalLanguage = in.readString();
+        title = in.readString();
+        voteAverage = in.readDouble();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public String getPosterPath() {
         return posterPath;
@@ -108,5 +139,31 @@ public class Movie implements Serializable {
 
     public void setVoteAverage(double voteAverage) {
         this.voteAverage = voteAverage;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(posterPath);
+        parcel.writeString(overview);
+        parcel.writeString(releaseDate);
+        parcel.writeString(originalTitle);
+        parcel.writeString(originalLanguage);
+        parcel.writeString(title);
+        parcel.writeDouble(voteAverage);
     }
 }
