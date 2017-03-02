@@ -44,8 +44,19 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
-        return null;
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+
+        SQLiteDatabase db = movieDbHelper.getReadableDatabase();
+
+        // Check if the uri is valid
+        int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case CODE_MOVIE:
+                return db.query(MovieContract.MovieEntry.TABLE_NAME, null, null, null, null, null, null);
+            default:
+                throw new IllegalArgumentException("Unknown URI");
+        }
     }
 
     @Nullable

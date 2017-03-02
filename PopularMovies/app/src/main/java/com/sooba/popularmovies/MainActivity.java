@@ -1,9 +1,12 @@
 package com.sooba.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.sooba.popularmovies.data.MovieContract;
 import com.sooba.popularmovies.model.Movie;
 import com.sooba.popularmovies.utilities.Constants;
 import com.sooba.popularmovies.utilities.NetworkUtils;
@@ -156,6 +160,44 @@ public class MainActivity extends AppCompatActivity  {
         }
     };
 
+    private LoaderManager.LoaderCallbacks<Cursor> fetchFavoriteMoviesLoader = new LoaderManager.LoaderCallbacks<Cursor>() {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+            Uri baseUri = Uri.withAppendedPath(MovieContract.BASE_CONTENT_URI,
+                    MovieContract.PATH_MOVIE);
+
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+            return new CursorLoader(MainActivity.this, baseUri,
+                    null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if(null != data) {
+
+                mMovies = new ArrayList<>();
+
+                if(data.moveToFirst()) {
+                    do {
+                        mMovies.add(new Movie(data));
+
+                    } while(data.moveToNext());
+                }
+
+                moviesAdapter.setData(mMovies);
+                moviesAdapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -230,6 +272,10 @@ public class MainActivity extends AppCompatActivity  {
             Bundle bundle = new Bundle();
             bundle.putString(URL_KEY, topRatedUrl.toString());
             getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, fetchMoviesLoader);
+        } else if (id == R.id.action_favorite) {
+
+            getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER_ID, null, fetchFavoriteMoviesLoader).forceLoad();
+
         }
 
         return true;

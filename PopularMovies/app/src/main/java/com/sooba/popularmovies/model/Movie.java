@@ -1,7 +1,10 @@
 package com.sooba.popularmovies.model;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.sooba.popularmovies.data.MovieContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,6 +62,19 @@ public class Movie implements Parcelable {
 
         if(jsonMovie.has(VOTE_AVERAGE)) {
             voteAverage = jsonMovie.getDouble(VOTE_AVERAGE);
+        }
+    }
+
+    public Movie(Cursor cursor) {
+        if(null != cursor) {
+            id = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
+            posterPath = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH));
+            overview = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_OVERVIEW));
+            releaseDate = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE));
+            originalTitle = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE));
+            originalLanguage = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE));
+            title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
+            voteAverage = cursor.getDouble(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE));
         }
     }
 
