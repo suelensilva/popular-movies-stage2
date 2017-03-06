@@ -54,6 +54,10 @@ public class MovieProvider extends ContentProvider {
         switch (match) {
             case CODE_MOVIE:
                 return db.query(MovieContract.MovieEntry.TABLE_NAME, null, null, null, null, null, null);
+            case CODE_MOVIE_WITH_ID:
+                String movieId = uri.getLastPathSegment();
+                return db.query(MovieContract.MovieEntry.TABLE_NAME, null, MovieContract.MovieEntry.COLUMN_MOVIE_ID+" = ?",
+                        new String[] {movieId}, null, null, null);
             default:
                 throw new IllegalArgumentException("Unknown URI");
         }
@@ -101,7 +105,31 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+
+        SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+
+        // Check if the uri is valid
+        int match = sUriMatcher.match(uri);
+
+        int rowsAffected;
+        switch (match) {
+            case CODE_MOVIE:
+                rowsAffected = db.delete(MovieContract.MovieEntry.TABLE_NAME, null, null);
+                break;
+            case CODE_MOVIE_WITH_ID:
+                String movieId = uri.getLastPathSegment();
+                rowsAffected = db.delete(MovieContract.MovieEntry.TABLE_NAME, MovieContract.MovieEntry.COLUMN_MOVIE_ID+" = ?",
+                        new String[] {movieId});
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI");
+        }
+
+        if(rowsAffected > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsAffected;
     }
 
     @Override
