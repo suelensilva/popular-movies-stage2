@@ -3,30 +3,20 @@ package com.sooba.popularmovies;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RatingBar;
-import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.sooba.popularmovies.data.MovieContract;
-import com.sooba.popularmovies.data.MovieDbHelper;
 import com.sooba.popularmovies.databinding.ActivityMovieDetailBinding;
 import com.sooba.popularmovies.model.Movie;
+import com.sooba.popularmovies.model.Review;
 import com.sooba.popularmovies.model.Trailer;
 import com.sooba.popularmovies.utilities.Constants;
 import com.sooba.popularmovies.utilities.NetworkUtils;
@@ -55,6 +45,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     // Views
     private ActivityMovieDetailBinding mMovieDetailBinding;
 
+    private ReviewsAdapter mReviewsAdapter;
+
+    private TrailerAdapter mTrailersAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +56,25 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // Initialize data binding
         mMovieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+
+
+        RecyclerView mTrailersRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
+        // Configure the recycler view with linear layout
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mTrailersRecyclerView.setLayoutManager(layoutManager);
+        mTrailersRecyclerView.setNestedScrollingEnabled(false);
+        mTrailersRecyclerView.setHasFixedSize(true);
+
+        mTrailersAdapter = new TrailerAdapter();
+        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+
+        RecyclerView mReviewsRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
+        RecyclerView.LayoutManager reviewsLayoutManager = new LinearLayoutManager(this);
+        mReviewsRecyclerView.setLayoutManager(reviewsLayoutManager);
+        mReviewsRecyclerView.setNestedScrollingEnabled(false);
+        mReviewsRecyclerView.setHasFixedSize(false);
+        mReviewsAdapter = new ReviewsAdapter(this);
+        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
 
         Intent intent = getIntent();
 
@@ -87,9 +100,12 @@ public class MovieDetailActivity extends AppCompatActivity {
                 if(cursor.moveToFirst()) {
                     mMovieDetailBinding.tbFavorite.setChecked(true);
                 }
+
+                cursor.close();
             }
 
             new FetchVideosTask().execute(mMovie.getId());
+            new FetchReviewsTask().execute(mMovie.getId());
         }
     }
 
@@ -137,7 +153,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    class FetchVideosTask extends AsyncTask<String, Void, List<Trailer>> {
+    private class FetchVideosTask extends AsyncTask<String, Void, List<Trailer>> {
 
         @Override
         protected List<Trailer> doInBackground(String... strings) {
@@ -145,7 +161,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
             URL url = NetworkUtils.buildVideoUrl(id, MovieDetailActivity.this.getString(R.string.api_key));
 
-            String moviesResponseJsonString = null;
+            String moviesResponseJsonString;
             List<Trailer> trailerList = null;
 
             // Connects and get the list of movies from service in json format
@@ -177,18 +193,51 @@ public class MovieDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Trailer> trailers) {
             if(trailers != null) {
-                LinearLayout trailersLinearLayout = (LinearLayout) findViewById(R.id.ll_trailer_layout);
+                mTrailersAdapter.setData(trailers);
+                mTrailersAdapter.notifyDataSetChanged();
+            }
+        }
+    }
 
-                for(Trailer trailer : trailers) {
-                    LinearLayout trailerItem = (LinearLayout) LayoutInflater.from(MovieDetailActivity.this).inflate(R.layout.trailer_item, null);
+    private class FetchReviewsTask extends AsyncTask<String, Void, List<Review>> {
 
-                    TextView tvTrailerName = (TextView) trailerItem.findViewById(R.id.tv_trailer_name);
-                    tvTrailerName.setText(trailer.getName());
+        @Override
+        protected List<Review> doInBackground(String... strings) {
+            String id = strings[0];
 
-                    trailersLinearLayout.addView(trailerItem);
+            URL url = NetworkUtils.buildReviewsUrl(id, MovieDetailActivity.this.getString(R.string.api_key));
 
-                    trailerItem.setTag(trailer);
+            String reviewsResponseJsonString;
+            List<Review> reviewList = null;
+
+            try {
+                reviewsResponseJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+
+                JSONObject reviewResponseJson = new JSONObject(reviewsResponseJsonString);
+                JSONArray results = reviewResponseJson.getJSONArray("results");
+
+                if (results != null && results.length() > 0) {
+                    reviewList = new ArrayList<>();
+
+                    for(int i = 0; i < results.length(); i++) {
+                        reviewList.add(new Review(results.getJSONObject(i)));
+                    }
                 }
+
+                return reviewList;
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Review> reviews) {
+            super.onPostExecute(reviews);
+
+            if(reviews != null) {
+                mReviewsAdapter.setDataList(reviews);
+                mReviewsAdapter.notifyDataSetChanged();
             }
         }
     }

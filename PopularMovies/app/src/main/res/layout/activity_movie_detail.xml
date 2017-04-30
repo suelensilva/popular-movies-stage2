@@ -1,93 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_movie_detail"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_movie_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.sooba.popularmovies.MovieDetailActivity"
-        >
+        tools:context="com.sooba.popularmovies.MovieDetailActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="130dp"
                 android:background="@color/colorAccent">
+
                 <TextView
                     android:id="@+id/tv_detail_title"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:textSize="30sp"
+                    android:gravity="center_vertical"
                     android:textColor="@color/white"
-                    />
+                    android:textSize="30sp" />
             </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
+                android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:orientation="horizontal">
+                android:paddingTop="8dp">
 
                 <ImageView
                     android:id="@+id/iv_detail_poster"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
                     android:layout_weight="1"
-                    android:baselineAligned="false">
+                    android:baselineAligned="false"
+                    android:orientation="vertical">
 
 
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="handleFavoriteMovie"
-                        android:text="Favorite"
-                        />
+                        android:text="Favorite" />
 
                     <ToggleButton
                         android:id="@+id/tb_favorite"
-                        android:background="@drawable/favorite_selector"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
-                        android:textOff=""
-                        android:textOn=""
+                        android:background="@drawable/favorite_selector"
                         android:onClick="handleFavoriteMovie"
-                        />
+                        android:textOff=""
+                        android:textOn="" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="bottom">
+
                         <TextView
                             android:id="@+id/tv_release_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
+                            android:layout_marginTop="4dp"
                             android:gravity="bottom"
-                            android:textSize="20sp"/>
+                            android:textSize="20sp" />
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -101,11 +94,62 @@
                 android:layout_marginTop="8dp"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
-            <include layout="@layout/trailers_layout"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:textSize="22sp"
+                android:textColor="@color/colorAccent"
+                android:text="@string/trailers"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:background="@color/colorAccent"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_trailers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:textSize="22sp"
+                android:textColor="@color/colorAccent"
+                android:text="@string/reviews"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:background="@color/colorAccent"
+                android:layout_marginBottom="8dp"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                />
 
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </layout>

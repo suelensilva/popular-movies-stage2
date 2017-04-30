@@ -4,8 +4,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -86,6 +89,24 @@ public class NetworkUtils {
         return url;
     }
 
+    public static URL buildReviewsUrl(String movieId, String apiKey) {
+        if(TextUtils.isEmpty(movieId))
+            return null;
+
+        Uri.Builder builder = Uri.parse(MOVIES_URL).buildUpon();
+        builder.appendPath(movieId).appendPath("reviews").appendQueryParameter(API_KEY_QUERY, apiKey);
+        Uri uri = builder.build();
+
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error while building the URL query");
+        }
+
+        return url;
+    }
+
     /**
      * This method returns the entire result from the HTTP response.
      *
@@ -95,6 +116,7 @@ public class NetworkUtils {
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
         try {
             InputStream in = urlConnection.getInputStream();
 
