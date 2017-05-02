@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.sooba.popularmovies.data.MovieContract;
 import com.sooba.popularmovies.databinding.ActivityMovieDetailBinding;
@@ -30,6 +31,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,9 +48,14 @@ public class MovieDetailActivity extends AppCompatActivity {
     // Views
     private ActivityMovieDetailBinding mMovieDetailBinding;
 
+    private RecyclerView mReviewsRecyclerView;
     private ReviewsAdapter mReviewsAdapter;
 
+    private RecyclerView mTrailersRecyclerView;
     private TrailerAdapter mTrailersAdapter;
+
+    private TextView mNoTrailersTextView;
+    private TextView mNoReviewsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +66,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
 
 
-        RecyclerView mTrailersRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
+        mTrailersRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
         // Configure the recycler view with linear layout
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mTrailersRecyclerView.setLayoutManager(layoutManager);
@@ -68,13 +76,16 @@ public class MovieDetailActivity extends AppCompatActivity {
         mTrailersAdapter = new TrailerAdapter();
         mTrailersRecyclerView.setAdapter(mTrailersAdapter);
 
-        RecyclerView mReviewsRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
+        mReviewsRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
         RecyclerView.LayoutManager reviewsLayoutManager = new LinearLayoutManager(this);
         mReviewsRecyclerView.setLayoutManager(reviewsLayoutManager);
         mReviewsRecyclerView.setNestedScrollingEnabled(false);
         mReviewsRecyclerView.setHasFixedSize(false);
         mReviewsAdapter = new ReviewsAdapter(this);
         mReviewsRecyclerView.setAdapter(mReviewsAdapter);
+
+        mNoTrailersTextView = (TextView) findViewById(R.id.tv_no_trailers_msg);
+        mNoReviewsTextView = (TextView) findViewById(R.id.tv_no_review_msg);
 
         Intent intent = getIntent();
 
@@ -84,10 +95,20 @@ public class MovieDetailActivity extends AppCompatActivity {
             // Gets the movie to be shown
             mMovie = intent.getParcelableExtra(Constants.MOVIE_EXTRA);
 
+            Date releaseDate = Utils.getDateFromString(mMovie.getReleaseDate());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(releaseDate);
+
             // Setup the views with the movie values
             mMovieDetailBinding.tvDetailTitle.setText(mMovie.getOriginalTitle());
             mMovieDetailBinding.tvDetailOverview.setText(mMovie.getOverview());
-            mMovieDetailBinding.tvReleaseDate.setText(String.format(getString(R.string.release_date), mMovie.getReleaseDate()));
+            mMovieDetailBinding.tvMovieYear.setText(String.valueOf(calendar.get(Calendar.YEAR)));
+            mMovieDetailBinding.tvMovieRate.setText(String.format(getString(R.string.movie_rate), mMovie.getVoteAverage()));
+            if(mMovie.getRuntime() != 0) {
+                mMovieDetailBinding.tvMovieDuration.setText(String.format(getString(R.string.runtime), mMovie.getRuntime()));
+            } else {
+                new FetchMovieDetailTask().execute(mMovie.getId());
+            }
 
             String posterUrl = Utils.getPosterWidthByDpi(this) + mMovie.getPosterPath();
             Picasso.with(this).load(posterUrl).into(mMovieDetailBinding.ivDetailPoster);
@@ -130,6 +151,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             values.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, mMovie.getPosterPath());
             values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, mMovie.getReleaseDate());
             values.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, mMovie.getVoteAverage());
+            values.put(MovieContract.MovieEntry.COLUMN_RUNTIME, mMovie.getRuntime());
             values.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
 
             Uri.Builder uriBuilder = MovieContract.BASE_CONTENT_URI.buildUpon();
@@ -192,7 +214,14 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Trailer> trailers) {
-            if(trailers != null) {
+
+            if(trailers == null || trailers.size() == 0) {
+                mTrailersRecyclerView.setVisibility(View.GONE);
+                mNoTrailersTextView.setVisibility(View.VISIBLE);
+            } else {
+                mTrailersRecyclerView.setVisibility(View.VISIBLE);
+                mNoTrailersTextView.setVisibility(View.GONE);
+
                 mTrailersAdapter.setData(trailers);
                 mTrailersAdapter.notifyDataSetChanged();
             }
@@ -235,9 +264,48 @@ public class MovieDetailActivity extends AppCompatActivity {
         protected void onPostExecute(List<Review> reviews) {
             super.onPostExecute(reviews);
 
-            if(reviews != null) {
+            if(reviews == null || reviews.size() == 0) {
+                mReviewsRecyclerView.setVisibility(View.GONE);
+                mNoReviewsTextView.setVisibility(View.VISIBLE);
+            } else {
+                mReviewsRecyclerView.setVisibility(View.VISIBLE);
+                mNoReviewsTextView.setVisibility(View.GONE);
+
                 mReviewsAdapter.setDataList(reviews);
                 mReviewsAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private class FetchMovieDetailTask extends AsyncTask<String, Void, Movie> {
+
+        @Override
+        protected Movie doInBackground(String... strings) {
+            String id = strings[0];
+
+            URL url = NetworkUtils.buildMovieDetailsUrl(id, MovieDetailActivity.this.getString(R.string.api_key));
+
+            String movieDetailResponseJsonString;
+
+            try {
+                movieDetailResponseJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+
+                JSONObject movieDetailResponseJson = new JSONObject(movieDetailResponseJsonString);
+
+                return new Movie(movieDetailResponseJson);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Movie movie) {
+
+            if(movie != null) {
+                mMovie.setRuntime(movie.getRuntime());
+
+                mMovieDetailBinding.tvMovieDuration.setText(String.format(getString(R.string.runtime), mMovie.getRuntime()));
             }
         }
     }

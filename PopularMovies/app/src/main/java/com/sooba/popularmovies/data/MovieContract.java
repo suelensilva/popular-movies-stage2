@@ -26,7 +26,8 @@ public class MovieContract {
                     MovieEntry.COLUMN_RELEASE_DATE + " TEXT, "+
                     MovieEntry.COLUMN_VOTE_AVERAGE + " REAL, "+
                     MovieEntry.COLUMN_POSTER_PATH + " TEXT, " +
-                    MovieEntry.COLUMN_FAVORITE + " INTEGER "+
+                    MovieEntry.COLUMN_FAVORITE + " INTEGER, "+
+                    MovieEntry.COLUMN_RUNTIME + " INTEGER " +
                     " );";
 
     public static final String MOVIE_SQL_DROP_TABLE =
@@ -45,5 +46,6 @@ public class MovieContract {
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
         public static final String COLUMN_FAVORITE = "favorite";
+        public static final String COLUMN_RUNTIME = "runtime";
     }
 }

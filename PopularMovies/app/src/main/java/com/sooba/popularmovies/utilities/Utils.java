@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Utilities methods
  */
@@ -49,5 +53,17 @@ public class Utils {
         }
 
         return Constants.POSTER_BASE_URL + posterWidth;
+    }
+
+    public static Date getDateFromString(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date convertedDate = new Date();
+        try {
+            convertedDate = dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return convertedDate;
     }
 }

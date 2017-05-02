@@ -22,7 +22,9 @@ public class Movie implements Parcelable {
     private static final String ORIGINAL_TITLE_KEY = "original_title";
     private static final String ORIGINAL_LANGUAGE_KEY = "original_language";
     private static final String TITLE_KEY = "title";
-    private static final String VOTE_AVERAGE = "vote_average";
+    private static final String VOTE_AVERAGE_KEY = "vote_average";
+    private static final String RUNTIME_KEY = "runtime";
+
 
     private String id;
     private String posterPath;
@@ -32,6 +34,7 @@ public class Movie implements Parcelable {
     private String originalLanguage;
     private String title;
     private double voteAverage;
+    private int runtime;
 
     // Construction that uses a json string representing a movie to initialize
     // a new movie instance
@@ -60,8 +63,12 @@ public class Movie implements Parcelable {
             title = jsonMovie.getString(TITLE_KEY);
         }
 
-        if(jsonMovie.has(VOTE_AVERAGE)) {
-            voteAverage = jsonMovie.getDouble(VOTE_AVERAGE);
+        if(jsonMovie.has(VOTE_AVERAGE_KEY)) {
+            voteAverage = jsonMovie.getDouble(VOTE_AVERAGE_KEY);
+        }
+
+        if(jsonMovie.has(RUNTIME_KEY)) {
+            runtime = jsonMovie.getInt(RUNTIME_KEY);
         }
     }
 
@@ -75,6 +82,7 @@ public class Movie implements Parcelable {
             originalLanguage = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE));
             title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
             voteAverage = cursor.getDouble(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE));
+            runtime = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RUNTIME));
         }
     }
 
@@ -87,6 +95,7 @@ public class Movie implements Parcelable {
         originalLanguage = in.readString();
         title = in.readString();
         voteAverage = in.readDouble();
+        runtime = in.readInt();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -165,6 +174,13 @@ public class Movie implements Parcelable {
         this.id = id;
     }
 
+    public int getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(int runtime) {
+        this.runtime = runtime;
+    }
 
     @Override
     public int describeContents() {
@@ -181,5 +197,6 @@ public class Movie implements Parcelable {
         parcel.writeString(originalLanguage);
         parcel.writeString(title);
         parcel.writeDouble(voteAverage);
+        parcel.writeInt(runtime);
     }
 }

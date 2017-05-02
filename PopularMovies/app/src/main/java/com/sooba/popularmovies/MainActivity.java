@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity  {
         });
 
         // Configure the recycler view with grid layout
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.grid_columns));
         moviesRecyclerView.setLayoutManager(layoutManager);
         moviesRecyclerView.setHasFixedSize(true);
 

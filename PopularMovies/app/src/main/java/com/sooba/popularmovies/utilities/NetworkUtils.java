@@ -27,6 +27,9 @@ public class NetworkUtils {
     // Movies list criteria
     public static final String MOST_POPULAR_LIST = "popular";
     public static final String TOP_RATED_LIST = "top_rated";
+    public static final String VIDEOS_LIST = "videos";
+    public static final String REVIEW_LIST = "reviews";
+    public static final String MOVIE_DETAIL = "movie";
 
     // Queries to be appended in the URL
     private static final String API_KEY_QUERY = "api_key";
@@ -76,7 +79,7 @@ public class NetworkUtils {
             return null;
 
         Uri.Builder builder = Uri.parse(MOVIES_URL).buildUpon();
-        builder.appendPath(movieId).appendPath("videos").appendQueryParameter(API_KEY_QUERY, apiKey);
+        builder.appendPath(movieId).appendPath(VIDEOS_LIST).appendQueryParameter(API_KEY_QUERY, apiKey);
         Uri uri = builder.build();
 
         URL url = null;
@@ -94,7 +97,25 @@ public class NetworkUtils {
             return null;
 
         Uri.Builder builder = Uri.parse(MOVIES_URL).buildUpon();
-        builder.appendPath(movieId).appendPath("reviews").appendQueryParameter(API_KEY_QUERY, apiKey);
+        builder.appendPath(movieId).appendPath(REVIEW_LIST).appendQueryParameter(API_KEY_QUERY, apiKey);
+        Uri uri = builder.build();
+
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error while building the URL query");
+        }
+
+        return url;
+    }
+
+    public static URL buildMovieDetailsUrl(String movieId, String apiKey) {
+        if(TextUtils.isEmpty(movieId))
+            return null;
+
+        Uri.Builder builder = Uri.parse(MOVIES_URL).buildUpon();
+        builder.appendPath(movieId).appendQueryParameter(API_KEY_QUERY, apiKey);
         Uri uri = builder.build();
 
         URL url = null;

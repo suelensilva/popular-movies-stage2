@@ -8,4 +8,9 @@
     <string name="favorites">Favorites</string>
     <string name="trailers">Trailers</string>
     <string name="reviews">Reviews</string>
+    <string name="no_trailers">No trailers</string>
+    <string name="no_reviews">No reviews</string>
+    <string name="runtime">%d min</string>
+    <string name="movie_rate">%.2f/10</string>
+    <string name="movie_poster">Movie poster</string>
 </resources>
