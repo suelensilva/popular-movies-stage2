@@ -74,6 +74,13 @@ public class NetworkUtils {
         return url;
     }
 
+    /**
+     * Builds a url to fetch a video list of a movie
+     *
+     * @param movieId the movie identification
+     * @param apiKey the apiKey of movies service
+     * @return an URL, built with the given criteria
+     */
     public static URL buildVideoUrl(String movieId, String apiKey){
         if(TextUtils.isEmpty(movieId))
             return null;
@@ -92,6 +99,14 @@ public class NetworkUtils {
         return url;
     }
 
+
+    /**
+     * Builds a url to fetch a list of a movie reviews
+     *
+     * @param movieId the movie identification
+     * @param apiKey the apiKey of the movies service
+     * @return an URL, built with the given criteria
+     */
     public static URL buildReviewsUrl(String movieId, String apiKey) {
         if(TextUtils.isEmpty(movieId))
             return null;
@@ -110,6 +125,13 @@ public class NetworkUtils {
         return url;
     }
 
+    /**
+     * Builds a url to fetch a movie detail
+     *
+     * @param movieId the movie identification
+     * @param apiKey the apiKey of the movie service
+     * @return an URL, built with the given criteria
+     */
     public static URL buildMovieDetailsUrl(String movieId, String apiKey) {
         if(TextUtils.isEmpty(movieId))
             return null;

@@ -3,8 +3,12 @@ package com.sooba.popularmovies.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Class that represents a movie review
+ */
 public class Review {
 
+    /* json keys for reviews attributes */
     private static final String ID_KEY = "id";
     private static final String AUTHOR_KEY = "author";
     private static final String CONTENT_KEY = "content";
@@ -15,10 +19,8 @@ public class Review {
     private String content;
     private String url;
 
-    public Review() {
-
-    }
-
+    // Constructor that uses a json object representing a review
+    // and use it to initialize a new review instance
     public Review(JSONObject jsonObject) throws JSONException {
         if (jsonObject.has(ID_KEY)) {
             id = jsonObject.getString(ID_KEY);

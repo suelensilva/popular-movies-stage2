@@ -7,6 +7,7 @@ import android.util.DisplayMetrics;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Utilities methods
@@ -55,13 +56,21 @@ public class Utils {
         return Constants.POSTER_BASE_URL + posterWidth;
     }
 
+    /**
+     * Given a string that contains a date in the format 'yyyy-MM-dd', returns a
+     * {@link Date} object containing the same date
+     *
+     * @param dateString the string with the formatted date
+     * @return an object of Date type with the same date of the given string
+     */
     public static Date getDateFromString(String dateString) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date convertedDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date convertedDate;
         try {
             convertedDate = dateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
         }
 
         return convertedDate;

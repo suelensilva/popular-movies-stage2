@@ -12,8 +12,13 @@ import com.sooba.popularmovies.model.Trailer;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * A recycler view adapter to show a list of movie Trailers
+ */
 class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerHolder> {
 
+    // Trailers list
     private List<Trailer> trailers = new ArrayList<>();
 
     TrailerAdapter() {
@@ -23,6 +28,7 @@ class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerHolder> 
     public TrailerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
 
+        // Inflates the view and initialize the holder
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.trailer_item, parent, false);
         return new TrailerHolder(view);
@@ -32,6 +38,7 @@ class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerHolder> 
     public void onBindViewHolder(TrailerHolder holder, int position) {
         Trailer trailer = trailers.get(position);
 
+        // Updates the view with the trailer content
         holder.trailerNameTextView.setText(trailer.getName());
         holder.trailerLayoutItem.setTag(trailer);
     }
@@ -50,6 +57,7 @@ class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerHolder> 
         return trailers.size();
     }
 
+    // View holder to keep a reference to view objects
     class TrailerHolder extends RecyclerView.ViewHolder {
 
         final View trailerLayoutItem;
@@ -58,6 +66,7 @@ class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerHolder> 
         TrailerHolder(View itemView) {
             super(itemView);
 
+            // Initialize the view
             trailerLayoutItem = itemView;
             trailerNameTextView = (TextView) itemView.findViewById(R.id.tv_trailer_name);
         }

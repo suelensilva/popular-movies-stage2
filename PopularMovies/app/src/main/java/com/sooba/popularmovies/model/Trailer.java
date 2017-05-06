@@ -6,9 +6,9 @@ import org.json.JSONObject;
 /**
  * Represents a Movie trailer
  */
-
 public class Trailer {
 
+    /* json keys for trailers attributes */
     private static final String ID_KEY = "id";
     private static final String KEY_KEY = "key";
     private static final String NAME_KEY = "name";
@@ -21,6 +21,8 @@ public class Trailer {
     private String site;
     private String type;
 
+    // Constructor that uses a json object representing a trailer
+    // to initialize a new trailer instance
     public Trailer(JSONObject jsonTrailer) throws JSONException {
 
         if(jsonTrailer.has(ID_KEY)) {

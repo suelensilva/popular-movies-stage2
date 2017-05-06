@@ -12,6 +12,9 @@ import com.sooba.popularmovies.model.Review;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A recycler view adapter to show a list of movie reviews
+ */
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewHolder> {
 
     Context mContext;
@@ -25,6 +28,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewHo
     public ReviewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
 
+        // Inflates the view and initialize the Holder
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.review_item, parent, false);
 
@@ -38,6 +42,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewHo
         String author = review.getAuthor();
         String content = review.getContent();
 
+        // Updates the view with the review content
         holder.mAuthor.setText(author);
         holder.mContent.setText(content);
     }
@@ -57,6 +62,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewHo
         return reviews.size();
     }
 
+    // View holder to keep a reference to view objects
     class ReviewHolder extends RecyclerView.ViewHolder {
 
         public final TextView mAuthor;
@@ -65,6 +71,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewHo
         public ReviewHolder(View itemView) {
             super(itemView);
 
+            // Initialize the views
             mAuthor = (TextView) itemView.findViewById(R.id.review_author_textview);
             mContent = (TextView) itemView.findViewById(R.id.review_content_textview);
         }

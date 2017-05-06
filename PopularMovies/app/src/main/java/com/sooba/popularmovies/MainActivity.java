@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    // The types of loaders used in this activity
     private static final int FAVORITE_MOVIES_LOADER_ID = 10;
     private static final int FETCH_MOVIES_LOADER_ID = 11;
 
@@ -103,7 +104,6 @@ public class MainActivity extends AppCompatActivity  {
 
                     return moviesResponseJson;
                 }
-
             };
         }
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity  {
                     } else {
 
                         // Result values come empty, so show the error message
-                        showErrorMessage();
+                        showErrorMessage(null);
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "Error while parsing response", e);
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity  {
             } else {
 
                 // No response received. Shows the error message
-                showErrorMessage();
+                showErrorMessage(null);
             }
         }
 
@@ -160,6 +160,7 @@ public class MainActivity extends AppCompatActivity  {
         }
     };
 
+    /* Loader to fetch favorite movies from content provider in the background thread */
     private LoaderManager.LoaderCallbacks<Cursor> fetchFavoriteMoviesLoader = new LoaderManager.LoaderCallbacks<Cursor>() {
 
         @Override
@@ -180,21 +181,35 @@ public class MainActivity extends AppCompatActivity  {
 
                 mMovies = new ArrayList<>();
 
+                // Read the movies info from returned cursor
                 if(data.moveToFirst()) {
                     do {
                         mMovies.add(new Movie(data));
-
                     } while(data.moveToNext());
                 }
 
-                moviesAdapter.setData(mMovies);
-                moviesAdapter.notifyDataSetChanged();
+
+                if(mMovies.size() > 0) {
+
+                    showMovieGrid();
+
+                    // Update the adapter with the new set of movies list
+                    moviesAdapter.setData(mMovies);
+                    moviesRecyclerView.setAdapter(moviesAdapter);
+
+                    // Notifies the new values, so, if there is old values
+                    // they'll be invalidate
+                    moviesAdapter.notifyDataSetChanged();
+                } else {
+
+                    // Cursor came empty, so show the error message
+                    showErrorMessage(getString(R.string.no_favorite_movies));
+                }
             }
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-
         }
     };
 
@@ -263,6 +278,7 @@ public class MainActivity extends AppCompatActivity  {
             Bundle bundle = new Bundle();
             bundle.putString(URL_KEY, mostPopularUrl.toString());
             getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, fetchMoviesLoader);
+
         } else if (id == R.id.action_top_rated) {
 
             // Builds the url that searches for the top rated movies
@@ -272,9 +288,10 @@ public class MainActivity extends AppCompatActivity  {
             Bundle bundle = new Bundle();
             bundle.putString(URL_KEY, topRatedUrl.toString());
             getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, fetchMoviesLoader);
+
         } else if (id == R.id.action_favorite) {
 
-            getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER_ID, null, fetchFavoriteMoviesLoader).forceLoad();
+            getSupportLoaderManager().restartLoader(FAVORITE_MOVIES_LOADER_ID, null, fetchFavoriteMoviesLoader);
 
         }
 
@@ -282,9 +299,16 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     // show error and hide movies list
-    private void showErrorMessage() {
+    private void showErrorMessage(String errorMessage) {
         moviesRecyclerView.setVisibility(View.INVISIBLE);
         mErrorTextView.setVisibility(View.VISIBLE);
+
+        if(!TextUtils.isEmpty(errorMessage)) {
+            mErrorTextView.setText(errorMessage);
+        } else {
+            // Default error message
+            mErrorTextView.setText(R.string.error_message);
+        }
     }
 
     // show movies list and hide error message
